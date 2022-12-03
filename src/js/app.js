@@ -86,7 +86,6 @@ function getTrivia(difficulty, category, type) {
             for (let i = 0; i < dataTrivia.length; i++) {
                 triviaQuestions.push(dataTrivia[i].question);
             }
-            renderQuestion(triviaQuestions);
         })
 }
 
@@ -100,6 +99,5 @@ function cleanHTML() {
     main.innerHTML = '';
 }
 
-console.log(questions)
 
 
