@@ -20,6 +20,7 @@ class Game {
     constructor(game) {
         this.number = 1;
         this.score = Number(0);
+        this.timer = false;
     }
 }
 
@@ -28,10 +29,10 @@ const game = new Game();
 class UI {
     printQuestion(message) {
         const divQuestion = document.createElement('div');
-        divQuestion.classList.add('game-question');
+        divQuestion.classList.add('main__question');
 
         const pQuestion = document.createElement('p');
-        pQuestion.classList.add('p-question');
+        pQuestion.classList.add('question__text');
         divQuestion.appendChild(pQuestion);
         pQuestion.textContent = message;
 
@@ -54,17 +55,16 @@ class UI {
     }
 
     printStats() {
-        const gameQuestion = document.querySelector('.p-question')
-
+        const gameQuestion = document.querySelector('.question__text')
         const contentStats = document.createElement('div');
         const contentNumber = document.createElement('div');
         const contentScore = document.createElement('div');
         const contentTime = document.createElement('div');
 
         contentStats.classList.add('stats');
-        contentNumber.classList.add('stats__number');
-        contentScore.classList.add('stats__score');
-        contentTime.classList.add('stats__time');
+        contentNumber.classList.add('stats__item');
+        contentScore.classList.add('stats__item');
+        contentTime.classList.add('stats__item--time');
 
         contentNumber.textContent = '#' + game.number + ' / 10';
         contentScore.textContent = 'Score: ' + game.score;
@@ -74,36 +74,75 @@ class UI {
         contentStats.appendChild(contentScore);
         contentStats.appendChild(contentTime);
 
-        gameQuestion.insertAdjacentElement('beforebegin', contentStats)
+        gameQuestion.insertAdjacentElement('beforeend', contentStats);
     }
 
-    printTimer() {
-        const contentTime = document.querySelector('.stats__time');
-        let number = 7;
+    printTimer(currentTime) {
+        const contentTime = document.querySelector('.stats__item--time');
+        contentTime.textContent = '0:0' + currentTime;
+    }
 
-        const timer = setInterval(() => {
-            contentTime.textContent = '0:0' + number;
-            number--;
-            if (number == 0) {
-                clearInterval(timer)
-            }
-        }, 1000)
-        
+    printNext(message) {
+        const answerItem = document.querySelector('#answers');
+        const blurBackground = document.createElement('div');
+        const contentResult = document.createElement('div');
+        const result = document.createElement('h1');
+        const btnNext = document.createElement('button');
+
+        blurBackground.classList.add('main__blur');
+        contentResult.classList.add('result');
+        result.classList.add('main__result-answer', 'alert-succes');
+        btnNext.classList.add('main__btn-next', 'btn-1');
+
+        result.textContent = message;
+        btnNext.textContent = 'Next Question';
+
+        main.appendChild(blurBackground);
+        main.appendChild(result);
+        main.appendChild(btnNext);
+
+        setTimeout(() => {
+            result.remove();
+            blurBackground.remove();
+        }, 1900)
     }
 
     printEndGame() {
         const contentEnd = document.createElement('div');
         const btnEnd = document.createElement('button');
         const contentScore = document.createElement('div');
+        const title = document.createElement('h1');
         const score = document.createElement('p');
         const message = document.createElement('p');
 
         contentEnd.classList.add('end-screen');
-        btnEnd.classList.add('end-screen__button');
+        btnEnd.classList.add('end-screen__button', 'btn-1');
+        contentScore.classList.add('end-screen__score');
+        title.classList.add('end-screen__title');
+        score.classList.add('end-screen__score--item');
+        message.classList.add('end-screen__score--item');
 
+        title.textContent = 'Has completado el juego.';
 
+        score.textContent = game.score;
 
-        contentEnd.appendChild(btnEnd)
+        if (game.score < 250) {
+            message.textContent = 'Auch!';
+        } else if (game.score < 500) {
+            message.textContent = 'Sigue practicando...';
+        } else if (game.score < 750) {
+            message.textContent = 'Bien hecho!';
+        } else {
+            message.textContent = 'Excelente puntaje!';
+        }
+
+        btnEnd.textContent = 'Volver a jugar';
+
+        contentEnd.appendChild(title);
+        contentScore.appendChild(score);
+        contentScore.appendChild(message);
+        contentEnd.appendChild(contentScore);
+        contentEnd.appendChild(btnEnd);
         main.appendChild(contentEnd);
     }
 
@@ -120,10 +159,6 @@ class UI {
         divMessage.textContent = message;
 
         main.insertBefore(divMessage, form);
-    
-        setTimeout(() => {
-            divMessage.remove();
-        }, 5000);
     }
 }
 
@@ -177,14 +212,13 @@ function getQuestion() {
 }
 
 function renderQuestion(data) {
-
     cleanHTML();
-
-    ui.printQuestion(data.question)
 
     let correctAnswer = data.correct_answer;
     let incorrectAnswer = data.incorrect_answers;
     let optionList = incorrectAnswer;
+
+    ui.printQuestion(data.question)
 
     optionList.splice(Math.floor(Math.random() * optionList.length), 0, correctAnswer);
 
@@ -192,50 +226,70 @@ function renderQuestion(data) {
         ui.printAnswers(optionList[i]);
     }
 
-    console.log(correctAnswer, optionList)
-
     ui.printStats();
-    
-    timerQuestion();
+
     checkAnswer(correctAnswer);
     endGame();
+
+    console.log(correctAnswer, optionList)
+}
+
+function startTimer() {
+    let currentTime = 7;
+
+    timer = setInterval(function() {
+        ui.printTimer(currentTime)
+        currentTime--;
+        if (currentTime === -1) {
+            game.score = game.score - 100;
+            game.number = game.number + 1;
+            game.timer = false;
+            console.log(game.score)
+            clearInterval(timer);
+            ui.printNext('Time over');
+            nextQuestion();
+        }
+    }, 1000)
 }
 
 function checkAnswer(correctAnswer) {
-    const answerItems = document.querySelectorAll('.answers__item')
+    startTimer();
+
+    const answerItems = document.querySelectorAll('.answers__item');
 
     for (let i = 0; i < answerItems.length; i++) {
         answerItems[i].addEventListener('click', function() {
             if (answerItems[i].textContent == correctAnswer) {
                 game.score = game.score + 100;
                 game.number = game.number + 1;
+                game.timer = false;
                 console.log(game.score, game.number)
-                getQuestion();
+                clearInterval(timer);
+                answerItems[i].style.backgroundColor = 'blueviolet';
+                answerItems[i].style.color = 'white';
+                ui.printNext('Correct!');
+                nextQuestion();
             } else {
                 game.score = game.score - 100;
                 game.number = game.number + 1;
+                game.timer = false;
                 console.log(game.score)
-                getQuestion();
+                clearInterval(timer);
+                ui.printNext('Incorrect');
+                nextQuestion();
             }
         })
     }
 }
 
-function timerQuestion() {
-    let number = 8;
+function nextQuestion(correctAnswer) {
+    const btnNext = document.querySelector('.main__btn-next');
+    const contentStats = document.querySelector('.stats');
 
-    ui.printTimer();
+    contentStats.remove();
+    ui.printStats();
 
-    const timer = setInterval(() => {
-        number--;
-        if (number == 0) {
-            game.number++;
-            clearInterval(timer);
-            getQuestion();
-        }
-    }, 1000)
-
-    clearInterval(timer);
+    btnNext.addEventListener('click', getQuestion);
 }
 
 function endGame() {

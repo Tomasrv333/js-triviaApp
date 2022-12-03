@@ -11,8 +11,13 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+h1 {
+    font-size: 1.1rem;
+}
+
 .btn-1 {
-    width: 40%;
+    width: fit-
+    ;
     height: 2.4rem;
     padding: 0.6rem 2rem;
     color: white;
@@ -53,6 +58,16 @@ body {
     border-radius: 0.8rem;
 }
 
+.main__blur {
+    width: 75%;
+    height: 80%;
+    background-color: white;
+    position: absolute;
+    z-index: 5;
+    filter: blur(0.5rem);
+    opacity: 0.95;
+}
+
 form {
     display: flex;
     flex-direction: column;
@@ -80,55 +95,73 @@ select {
     justify-content: center;
 }
 
-.p-question {
+.question__text {
     width: 22rem;
-    padding: 1rem;
-    color: blueviolet;
-    text-align: center;
+    padding: 0 1rem;
+    margin: 0;
+    margin-top: 1rem;
+    border: 0.1rem dashed blueviolet;
+    border: 0.6rem;
+    color: black;
+    text-align: justify;
+    font-size: 1rem;
 }
 
 #answers {
     width: 22rem;
     padding: 1rem;
     height: fit-content;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
 }
 
 .answers__item {
+    font-size: 0.9rem;
     height: fit-content;
     display: flex;
-    padding: 3rem;
+    padding: 0.6rem;
     align-items: center;
     justify-content: center;
-    color: white;
-    background-color: blueviolet;
+    color: blueviolet;
+    background-color: transparent;
+    border: 0.1rem solid blueviolet;
     border-radius: 0.6rem;
     transition: .2s;
 }
 
-.answers-item:hover {
-    padding: 2.8rem;
-    color: blueviolet;
-    background-color: transparent;
+.answers__item:hover {
+    color: white;
+    background-color: blueviolet;
     border: 0.1rem solid blueviolet;
     transition: .2s;
 }
 
 .stats {
-    width: 22rem;
-    padding: 1rem;
+    margin: 0;
+    margin-top: 2rem;
+    padding: 0.4rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: blueviolet;
+    background-color: rgb(240, 240, 240);
+    border-radius: 0.6rem;
 }
 
-.stats__score {
-    padding: 0.3rem 0.6rem;
+.main__btn-next {
+    margin-top: 1rem;
+}
+
+.main__result-answer {
+    position: absolute;
+    height: fit-content;
+    text-align: center;
+    margin: 0;
+    margin-bottom: 2rem;
+    padding: 0.8rem;
     color: white;
     background-color: blueviolet;
     border-radius: 0.6rem;
+    z-index: 10;
 }
